@@ -1,0 +1,7 @@
+/composer.lock
+/phpunit.xml
+/vendor
+/tmp
+/.idea
+.php_cs*
+/coverage

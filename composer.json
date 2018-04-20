@@ -1,0 +1,36 @@
+{
+    "name": "andrej-griniuk/cakephp-html-to-image-view",
+    "description": "HtmlToImageView plugin for CakePHP",
+    "type": "cakephp-plugin",
+    "keywords": ["cakephp", "htmltoimage", "html", "image", "wkhtmltopdf", "wkhtmltoimage"],
+    "homepage": "https://github.com/andrej-griniuk/cakephp-html-to-image",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Andrej Griniuk",
+            "email": "andrej.griniuk@gmail.com",
+            "role": "Author"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/andrej-griniuk/cakephp-html-to-image-view/issues",
+        "source": "https://github.com/andrej-griniuk/cakephp-html-to-image-view"
+    },
+    "require": {
+        "cakephp/cakephp": "^3.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.7.14|^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "HtmlToImageView\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "HtmlToImageView\\Test\\": "tests/",
+            "Cake\\Test\\": "vendor/cakephp/cakephp/tests/"
+        }
+    }
+}
