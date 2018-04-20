@@ -1,7 +1,6 @@
 <?php
 namespace HtmlToImageView\View;
 
-use Cake\Core\Configure;
 use Cake\Core\Exception\Exception;
 use Cake\Event\EventManager;
 use Cake\Http\Response;
@@ -124,20 +123,19 @@ class HtmlToImageView extends View
         $command = $this->_getCommand();
         $content = $this->_exec($command, $html);
 
-        if (!empty($content['stderr'])) {
+        if ($error = Hash::get($content, 'stderr')) {
             throw new Exception(sprintf(
-                'System error "%s" when executing command "%s". ' .
-                'Try using the binary provided on http://wkhtmltopdf.org/downloads.html',
-                $content['stderr'],
+                'System error "%s" when executing command "%s". Try using the binary provided on http://wkhtmltopdf.org/downloads.html',
+                $error,
                 $command
             ));
         }
 
-        if (empty($content['stdout'])) {
-            throw new Exception("WKHTMLTOIMAGE didn't return any data");
+        if (!$output = Hash::get($content, 'stdout')) {
+            throw new Exception("wkhtmltoimage didn't return any data");
         }
 
-        return $content['stdout'];
+        return $output;
     }
 
     /**
