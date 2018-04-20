@@ -2,7 +2,7 @@
     "name": "andrej-griniuk/cakephp-html-to-image-view",
     "description": "HtmlToImageView plugin for CakePHP",
     "type": "cakephp-plugin",
-    "keywords": ["cakephp", "htmltoimage", "html", "image", "wkhtmltopdf", "wkhtmltoimage"],
+    "keywords": ["cakephp", "htmltoimage", "html", "image", "wkhtmltopdf", "wkhtmltoimage", "view"],
     "homepage": "https://github.com/andrej-griniuk/cakephp-html-to-image",
     "license": "MIT",
     "authors": [
