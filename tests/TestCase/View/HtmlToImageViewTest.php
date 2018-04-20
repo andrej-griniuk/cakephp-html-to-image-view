@@ -43,7 +43,16 @@ class HtmlToImageViewTest extends TestCase
         $request = new ServerRequest();
         $response = new Response();
         $this->View = $this->getMockBuilder('HtmlToImageView\View\HtmlToImageView')
-            ->setConstructorArgs([$request, $response])
+            ->setConstructorArgs([
+                $request,
+                $response,
+                null,
+                [
+                    'imageConfig' => [
+                        'binary' => '/bin/echo'
+                    ]
+                ]
+            ])
             ->setMethods(['output'])
             ->getMock();
 
@@ -66,14 +75,23 @@ class HtmlToImageViewTest extends TestCase
         $request = new ServerRequest();
         $response = new Response();
         $this->View = $this->getMockBuilder('HtmlToImageView\View\HtmlToImageView')
-            ->setConstructorArgs([$request, $response])
+            ->setConstructorArgs([
+                $request,
+                $response,
+                null,
+                [
+                    'imageConfig' => [
+                        'binary' => '/bin/echo'
+                    ]
+                ]
+            ])
             ->setMethods(['_exec'])
             ->getMock();
 
         $this->View
             ->expects($this->once())
             ->method('_exec')
-            ->with('/usr/bin/wkhtmltoimage --format \'jpg\' --quiet - -', 'html')
+            ->with('/bin/echo --format \'jpg\' --quiet - -', 'html')
             ->will($this->returnValue([
                 'stderr' => '',
                 'stdout' => '',
@@ -93,14 +111,23 @@ class HtmlToImageViewTest extends TestCase
         $request = new ServerRequest();
         $response = new Response();
         $this->View = $this->getMockBuilder('HtmlToImageView\View\HtmlToImageView')
-            ->setConstructorArgs([$request, $response])
+            ->setConstructorArgs([
+                $request,
+                $response,
+                null,
+                [
+                    'imageConfig' => [
+                        'binary' => '/bin/echo'
+                    ]
+                ]
+            ])
             ->setMethods(['_exec'])
             ->getMock();
 
         $this->View
             ->expects($this->once())
             ->method('_exec')
-            ->with('/usr/bin/wkhtmltoimage --format \'jpg\' --quiet - -', 'html')
+            ->with('/bin/echo --format \'jpg\' --quiet - -', 'html')
             ->will($this->returnValue([
                 'stderr' => 'wrong',
             ]));
