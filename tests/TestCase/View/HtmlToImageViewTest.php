@@ -82,7 +82,7 @@ class HtmlToImageViewTest extends TestCase
         $this->View
             ->expects($this->once())
             ->method('_exec')
-            ->with('/usr/bin/wkhtmltoimage --format \'jpg\' --quiet - -', 'html')
+            ->with('/bin/echo --format \'jpg\' --quiet - -', 'html')
             ->will($this->returnValue([
                 'stdout' => $expected = 'output',
             ]));
