@@ -43,16 +43,7 @@ class HtmlToImageViewTest extends TestCase
         $request = new ServerRequest();
         $response = new Response();
         $this->View = $this->getMockBuilder('HtmlToImageView\View\HtmlToImageView')
-            ->setConstructorArgs([
-                $request,
-                $response,
-                null,
-                [
-                    'imageConfig' => [
-                        'binary' => '/bin/echo'
-                    ]
-                ]
-            ])
+            ->setConstructorArgs([$request, $response])
             ->setMethods(['output'])
             ->getMock();
 
@@ -63,6 +54,40 @@ class HtmlToImageViewTest extends TestCase
             ->will($this->returnValue($expected = 'output'));
 
         $result = $this->View->render(false, false);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Tests output method
+     */
+    public function testOutput()
+    {
+        $request = new ServerRequest();
+        $response = new Response();
+        $this->View = $this->getMockBuilder('HtmlToImageView\View\HtmlToImageView')
+            ->setConstructorArgs([
+                $request,
+                $response,
+                null,
+                [
+                    'imageConfig' => [
+                        'binary' => '/bin/echo'
+                    ]
+                ]
+            ])
+            ->setMethods(['_exec'])
+            ->getMock();
+
+        $this->View
+            ->expects($this->once())
+            ->method('_exec')
+            ->with('/usr/bin/wkhtmltoimage --format \'jpg\' --quiet - -', 'html')
+            ->will($this->returnValue([
+                'stdout' => $expected = 'output',
+            ]));
+
+        $result = $this->View->output('html');
 
         $this->assertEquals($expected, $result);
     }
@@ -136,31 +161,6 @@ class HtmlToImageViewTest extends TestCase
         $this->expectExceptionMessageRegExp('/System error "wrong" when executing command/');
 
         $this->View->output('html');
-    }
-
-    /**
-     * Tests output method
-     */
-    public function testOutput()
-    {
-        $request = new ServerRequest();
-        $response = new Response();
-        $this->View = $this->getMockBuilder('HtmlToImageView\View\HtmlToImageView')
-            ->setConstructorArgs([$request, $response])
-            ->setMethods(['_exec'])
-            ->getMock();
-
-        $this->View
-            ->expects($this->once())
-            ->method('_exec')
-            ->with('/usr/bin/wkhtmltoimage --format \'jpg\' --quiet - -', 'html')
-            ->will($this->returnValue([
-                'stdout' => $expected = 'output',
-            ]));
-
-        $result = $this->View->output('html');
-
-        $this->assertEquals($expected, $result);
     }
 
     /**
