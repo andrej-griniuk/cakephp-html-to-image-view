@@ -22,6 +22,6 @@ unset($findRoot);
 
 chdir($root);
 
-require $root . '/vendor/cakephp/cakephp/tests/bootstrap.php';
+require_once $root . '/vendor/cakephp/cakephp/tests/bootstrap.php';
 
 Cake\Core\Plugin::load('HtmlToImageView', ['path' => ROOT . DS, 'autoload' => true, 'bootstrap' => true]);
