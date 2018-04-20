@@ -30,7 +30,23 @@ class HtmlToImageViewTest extends TestCase
         $request = new ServerRequest();
         $response = new Response();
         $this->View = new HtmlToImageView($request, $response);
-        $this->View->setLayoutPath('img');
+    }
+
+    /**
+     * Tests constructor
+     */
+    public function testConstructor()
+    {
+        $request = new ServerRequest();
+        $response = new Response();
+        $this->View = new HtmlToImageView($request, $response);
+        $this->assertEquals('img', $this->View->subDir);
+        $this->assertEquals('img', $this->View->getLayoutPath());
+
+        $this->View = new HtmlToImageView($request, $response, null, ['templatePath' => 'Error']);
+        $this->assertNull($this->View->subDir);
+        $this->assertNull($this->View->getLayoutPath());
+        $this->assertEquals('text/html', $this->View->response->getType());
     }
 
     /**
