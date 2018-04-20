@@ -116,7 +116,7 @@ class HtmlToImageView extends View
     /**
      * Generates image from html
      *
-     * @param $html
+     * @param string $html Input html
      * @return string Raw image data
      */
     public function output($html)
@@ -213,5 +213,4 @@ class HtmlToImageView extends View
 
         return $command;
     }
-
 }

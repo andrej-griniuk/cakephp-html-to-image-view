@@ -118,5 +118,4 @@ class HtmlToImageViewTest extends TestCase
         ];
         $this->assertEquals($expected, $result);
     }
-
 }
