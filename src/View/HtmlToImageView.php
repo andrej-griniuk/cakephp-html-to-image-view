@@ -1,6 +1,7 @@
 <?php
 namespace HtmlToImageView\View;
 
+use Cake\Core\Configure;
 use Cake\Core\Exception\Exception;
 use Cake\Event\EventManager;
 use Cake\Http\Response;
@@ -24,6 +25,13 @@ class HtmlToImageView extends View
     protected $_binary = '/usr/bin/wkhtmltoimage';
 
     /**
+     * List of allowed options for wkhtmltoimage command
+     *
+     * @var array
+     */
+    protected $_allowedImageOptions = ['crop-w', 'crop-h', 'crop-x', 'crop-y', 'width', 'height', 'format', 'quality', 'zoom'];
+
+    /**
      * Flag to indicate if the environment is windows
      *
      * @var bool
@@ -31,25 +39,25 @@ class HtmlToImageView extends View
     protected $_windowsEnvironment;
 
     /**
-     * The subdirectory. Image views are always in img.
+     * The subdirectory for image views
      *
      * @var string|null
      */
     public $subDir = 'img';
 
     /**
-     * The name of the layouts sub folder containing layouts for this View.
+     * The name of the layouts sub folder containing layouts for this View
      *
      * @var string|null
      */
     public $layoutPath = 'img';
 
     /**
-     * List of image config collected from the associated controller.
+     * List of image options
      *
      * @var array
      */
-    public $imageConfig = [];
+    public $imageOptions = [];
 
     /**
      * Constructor
@@ -57,9 +65,7 @@ class HtmlToImageView extends View
      * @param \Cake\Http\ServerRequest $request Request instance.
      * @param \Cake\Http\Response $response Response instance.
      * @param \Cake\Event\EventManager $eventManager Event manager instance.
-     * @param array $viewOptions View options. See View::$_passedVars for list of
-     *   options which get set as class properties.
-     *
+     * @param array $viewOptions View options. See View::$_passedVars for list of options which get set as class properties.
      * @throws \Cake\Core\Exception\Exception
      */
     public function __construct(
@@ -68,7 +74,8 @@ class HtmlToImageView extends View
         EventManager $eventManager = null,
         array $viewOptions = []
     ) {
-        $this->_passedVars[] = 'imageConfig';
+        $this->_passedVars[] = 'imageOptions';
+        $this->_windowsEnvironment = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
 
         parent::__construct($request, $response, $eventManager, $viewOptions);
 
@@ -76,19 +83,7 @@ class HtmlToImageView extends View
             $this->subDir = null;
             $this->layoutPath = null;
             $this->response = $this->response->withType('html');
-
-            return;
         }
-
-        if ($binary = Hash::get($this->imageConfig, 'binary')) {
-            $this->_binary = $binary;
-        }
-
-        if (!Hash::get($this->imageConfig, 'options.format')) {
-            $this->imageConfig['options']['format'] = $this->request->getParam('_ext', 'jpg');
-        }
-
-        $this->response = $this->response->withType($this->imageConfig['options']['format']);
     }
 
     /**
@@ -139,7 +134,7 @@ class HtmlToImageView extends View
     }
 
     /**
-     * Execute the WkHtmlToImage command to render image
+     * Execute the wkhtmltoimage command to render image
      *
      * @param string $cmd the command to execute
      * @param string $input Html to pass to wkhtmltoimage
@@ -172,16 +167,23 @@ class HtmlToImageView extends View
      */
     protected function _getCommand()
     {
+        if ($binary = Configure::read('HtmlToImageView.binary')) {
+            $this->_binary = $binary;
+        }
+
         if (!is_executable($this->_binary)) {
             throw new Exception(sprintf('wkhtmltoimage binary is not found or not executable: %s', $this->_binary));
         }
 
-        $options = (array)Hash::get($this->imageConfig, 'options', []);
+        if ($imageOptions = (array)Hash::get($this->viewOptions(), 'imageOptions', [])) {
+            $this->imageOptions = array_merge($this->imageOptions, $imageOptions);
+        }
 
-        $options = array_intersect_key(
-            $options,
-            array_flip(['crop-w', 'crop-h', 'crop-x', 'crop-y', 'width', 'height', 'format', 'quality', 'zoom'])
-        );
+        if (!Hash::get($this->imageOptions, 'format')) {
+            $this->imageOptions['format'] = $this->request->getParam('_ext', 'jpg');
+        }
+
+        $options = array_intersect_key($this->imageOptions, array_flip($this->_allowedImageOptions));
         $options['quiet'] = true;
 
         if ($this->_windowsEnvironment) {

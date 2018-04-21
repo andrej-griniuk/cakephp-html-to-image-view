@@ -2,6 +2,7 @@
 
 namespace ImageView\View;
 
+use Cake\Core\Configure;
 use Cake\Core\Exception\Exception;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
@@ -27,6 +28,7 @@ class HtmlToImageViewTest extends TestCase
     {
         parent::setUp();
 
+        Configure::write('HtmlToImageView.binary', '/bin/echo');
         $request = new ServerRequest();
         $response = new Response();
         $this->View = new HtmlToImageView($request, $response);
@@ -57,7 +59,7 @@ class HtmlToImageViewTest extends TestCase
     public function testRender()
     {
         $request = new ServerRequest();
-        $response = new Response();
+        $response = new Response(['type' => 'image/jpeg']);
         $this->View = $this->getMockBuilder('HtmlToImageView\View\HtmlToImageView')
             ->setConstructorArgs([$request, $response])
             ->setMethods(['output'])
@@ -82,16 +84,7 @@ class HtmlToImageViewTest extends TestCase
         $request = new ServerRequest();
         $response = new Response();
         $this->View = $this->getMockBuilder('HtmlToImageView\View\HtmlToImageView')
-            ->setConstructorArgs([
-                $request,
-                $response,
-                null,
-                [
-                    'imageConfig' => [
-                        'binary' => '/bin/echo'
-                    ]
-                ]
-            ])
+            ->setConstructorArgs([$request, $response])
             ->setMethods(['_exec'])
             ->getMock();
 
@@ -116,16 +109,7 @@ class HtmlToImageViewTest extends TestCase
         $request = new ServerRequest();
         $response = new Response();
         $this->View = $this->getMockBuilder('HtmlToImageView\View\HtmlToImageView')
-            ->setConstructorArgs([
-                $request,
-                $response,
-                null,
-                [
-                    'imageConfig' => [
-                        'binary' => '/bin/echo'
-                    ]
-                ]
-            ])
+            ->setConstructorArgs([$request, $response])
             ->setMethods(['_exec'])
             ->getMock();
 
@@ -152,16 +136,7 @@ class HtmlToImageViewTest extends TestCase
         $request = new ServerRequest();
         $response = new Response();
         $this->View = $this->getMockBuilder('HtmlToImageView\View\HtmlToImageView')
-            ->setConstructorArgs([
-                $request,
-                $response,
-                null,
-                [
-                    'imageConfig' => [
-                        'binary' => '/bin/echo'
-                    ]
-                ]
-            ])
+            ->setConstructorArgs([$request, $response])
             ->setMethods(['_exec'])
             ->getMock();
 
@@ -193,40 +168,31 @@ class HtmlToImageViewTest extends TestCase
         $method = $class->getMethod('_getCommand');
         $method->setAccessible(true);
 
-        $this->View = new HtmlToImageView($request, $response, null, [
-            'imageConfig' => [
-                'binary' => '/bin/echo'
-            ]
-        ]);
+        $this->View = new HtmlToImageView($request, $response);
         $result = $method->invokeArgs($this->View, []);
         $expected = "/bin/echo --format 'jpg' --quiet - -";
         $this->assertEquals($expected, $result);
 
+        Configure::write('HtmlToImageView.binary', '/bin/sh');
         $this->View = new HtmlToImageView($request, $response, null, [
-            'imageConfig' => [
-                'binary' => '/bin/sh',
-                'options' => [
-                    'crop-w' => 100,
-                    'crop-h' => 200,
-                    'crop-x' => 300,
-                    'crop-y' => 400,
-                    'width' => 500,
-                    'height' => 600,
-                    'format' => 'png',
-                    'quality' => 50,
-                    'zoom' => 1.5,
-                ]
+            'imageOptions' => [
+                'crop-w' => 100,
+                'crop-h' => 200,
+                'crop-x' => 300,
+                'crop-y' => 400,
+                'width' => 500,
+                'height' => 600,
+                'format' => 'png',
+                'quality' => 50,
+                'zoom' => 1.5,
             ]
         ]);
         $result = $method->invokeArgs($this->View, []);
         $expected = "/bin/sh --crop-w '100' --crop-h '200' --crop-x '300' --crop-y '400' --width '500' --height '600' --format 'png' --quality '50' --zoom '1.5' --quiet - -";
         $this->assertEquals($expected, $result);
 
-        $this->View = new HtmlToImageView($request, $response, null, [
-            'imageConfig' => [
-                'binary' => '/bin/nonexisting',
-            ]
-        ]);
+        Configure::write('HtmlToImageView.binary', '/bin/nonexisting');
+        $this->View = new HtmlToImageView($request, $response);
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('wkhtmltoimage binary is not found or not executable: /bin/nonexisting');
         $method->invokeArgs($this->View, []);
@@ -246,11 +212,7 @@ class HtmlToImageViewTest extends TestCase
         $method = $class->getMethod('_exec');
         $method->setAccessible(true);
 
-        $this->View = new HtmlToImageView($request, $response, null, [
-            'imageConfig' => [
-                'binary' => '/bin/echo'
-            ]
-        ]);
+        $this->View = new HtmlToImageView($request, $response);
 
         $result = $method->invokeArgs($this->View, ['/bin/echo test', 'test']);
         $expected = [

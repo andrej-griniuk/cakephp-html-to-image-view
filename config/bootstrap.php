@@ -8,6 +8,7 @@ EventManager::instance()->on(
         $controller = $event->getSubject();
         if ($controller->components()->has('RequestHandler')) {
             $controller->RequestHandler->setConfig('viewClassMap.jpg', 'HtmlToImageView.HtmlToImage');
+            $controller->RequestHandler->setConfig('viewClassMap.png', 'HtmlToImageView.HtmlToImage');
         }
     }
 );
